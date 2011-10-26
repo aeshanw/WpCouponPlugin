@@ -38,37 +38,22 @@ function insert_referid_hidden(){
 add_action('register_form','insert_referid_hidden');
 
 function get_refer_id($user_id){
-  echo "REFERID=".$_POST['refer_id'];
-  setcookie('completed','yes');
+  $COUPON_REFERAL_TBL = 'wp_coupon_referals';
+  $referid = $_POST['refer_id'];
+  
+  $data = array();
+  $data['friend_id'] = $user_id;
+  $data['referer_id'] = $referid;
+  $data['friend_coupon'] =  md5($referid.$userid); //referer coupon should be reverse
+  
+  //echo "REFERID=".$_POST['refer_id'];
+  $wpdb->show_errors();
+  $wpdb->insert($COUPON_REFERAL_TBL,$data);
+  $wpdb->print_error();
 }
 
 add_action('user_register','get_refer_id');
 
 
-//define('WP_DEBUG', true);
-//add_action( 'all', create_function( '', 'print_r( current_filter() );' ) );
-//session_start();
-//setcookie("refer_id", $_GET['refer_id'], time()+3600, "/", str_replace('http://','',get_bloginfo('url')),false,true );
-$_SESSION['hhihi'] = "fatty!";
-setcookie("refer_id", $_GET['refer_id'], time()+3600, "/",'localhost',false,true);
-var_dump($_GET['refer_id']);
 
-print_r(get_bloginfo('url'));
-var_dump($refer_id);
-
-  function wp_coupon_save_referid($refer_id){
-     if(!isset($refer_id)){
-        $refer_id = $_GET['referid'];
-      }
-    exit();
-     //save referid passed via GET url header to SESSION
-    setcookie("refer_id", $refer_id, time()+3600, "/", str_replace('http://','',get_bloginfo('url')) );
-    var_dump($_COOKIE['refer_id']);
-    return true;
-  }
-
-
-add_action('register','wp_coupon_save_referid');
-
-//add_filter('query_vars',array('CouponReferer','add_query_vars'))
 ?>
