@@ -16,24 +16,11 @@ class CouponReferer{
     return $aVars;
   }
 
-  function save_referid($refer_id){
-     if(!isset($refer_id)){
-        $refer_id = $_GET['referid'];
-      }
-    exit();
-     //save referid passed via GET url header to SESSION
-    setcookie("refer_id", $refer_id, time()+3600, "/", str_replace('http://','',get_bloginfo('url')) );
-    var_dump($_COOKIE['refer_id']);
-    return true;
+  function insert_referid_hidden(){
+    $refer_id = $_GET['refer_id'];
+    $field = '<input type="hidden" name="refer_id" value="'.$refer_id.'"/>';
+    echo $field;
   }
-}
-//exit();
-
-function insert_referid_hidden(){
-  $refer_id = $_GET['refer_id'];
-  $field = '<input type="hidden" name="refer_id" value="'.$refer_id.'"/>';
-  echo $field;
-}
 
 add_action('register_form','insert_referid_hidden');
 
