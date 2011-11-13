@@ -24,6 +24,8 @@ add_action('register_form','insert_referid_hidden');
 
 function get_refer_id($user_id){
   global $wpdb;
+  $wpdb->show_errors();
+
   $COUPON_REFERAL_TBL = $wpdb->prefix.'coupon_referals';
   $COUPON_TBL = $wpdb->prefix.'wpsc_coupon_codes';
   $referid = $_POST['refer_id'];
@@ -34,14 +36,15 @@ function get_refer_id($user_id){
  
   //create coupon
   $coupon = create_coupon($user_id,$referid);
+  print_r($coupon);
   $wpdb->insert($COUPON_TBL, $coupon);
+  print_r($wpdb->last_query);
+  $wpdb->print_error();
 
   $data['friend_coupon'] =  $coupon['coupon_code']; //referer coupon should b    e reverse
 
   print_r($data);
   //echo "REFERID=".$_POST['refer_id'];
-  $wpdb->show_errors();
-  
   $wpdb->insert($COUPON_REFERAL_TBL,$data);
   $wpdb->print_error();
 }
@@ -57,15 +60,15 @@ add_action('user_register','get_refer_id');
 */
 function create_coupon($userId,$referId){
   $coupon = array();
-  $coupon['coupon_code'] = md5($userId,$referId);
+  $coupon['coupon_code'] = substr(md5($userId.$referId),0,5);
   $coupon['value'] = 15.00;// %discount
   $coupon['is-percentage'] = 1;
   $coupon['use-once'] = 1;
   $coupon['is-used'] = 0;
   $coupon['active'] = 1;
   $coupon['every_product'] = 1;
-  $coupon['start'] = date();
-  $coupon['expiry'] = date();
+  $coupon['start'] = date('Y-m-d H:i:s'); //mysql date format
+  $coupon['expiry'] = date('Y-m-d H:i:s',strtotime('+1 month'));
   $coupon['condition'] = "";//special conditions
   return $coupon;
 }
