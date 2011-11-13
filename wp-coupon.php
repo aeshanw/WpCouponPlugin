@@ -9,6 +9,9 @@ Author URI: http://URI_Of_The_Plugin_Author
 License: none
 */
 
+global $coupon_referal_db_version;
+$coupon_referal_db_version = "1.0";
+
 function add_query_vars($aVars) {
     $aVars[] = "referid";    // represents the name of the product category as shown in the URL
     return $aVars;
@@ -21,6 +24,23 @@ function add_query_vars($aVars) {
   }
 
 add_action('register_form','insert_referid_hidden');
+
+function install_coupon_referal(){
+  global $wpdb;
+  $COUPON_REFERAL_TBL = $wpdb->prefix.'coupon_referals';
+  $sql = "CREATE TABLE $COUPON_REFERAL_TBL (
+    `coupon_referal_id` mediumint(3) NOT NULL AUTO_INCREMENT,
+    `friend_id` mediumint(3) NOT NULL,
+    `referer_id` mediumint(3) NOT NULL,
+    `friend_coupon` varchar(255) NOT NULL,
+    `referer_coupon` varchar(255) NOT NULL,
+    UNIQUE KEY coupon_referal_id(coupon_referal_id)
+  );";
+  require_once(ABSPATH.'wp-admin/includes/upgrade.php');
+  dbDelta($sql);
+
+  add_option();
+}
 
 function get_refer_id($user_id){
   global $wpdb;
@@ -91,12 +111,6 @@ function create_coupon($userId,$referId){
   $coupon['condition'] = "";//special conditions
   return $coupon;
 }
-
-
-
-
-
-
 
 
 ?>
