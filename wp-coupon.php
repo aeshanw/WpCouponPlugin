@@ -28,6 +28,10 @@ function get_refer_id($user_id){
 
   $COUPON_REFERAL_TBL = $wpdb->prefix.'coupon_referals';
   $COUPON_TBL = $wpdb->prefix.'wpsc_coupon_codes';
+  $EMAIL_SUBJECT = 'Congratz You got a coupon';
+  $EMAIL_BODY = '';
+  
+
   $referid = $_POST['refer_id'];
   
   $data = array();
@@ -42,11 +46,26 @@ function get_refer_id($user_id){
   $wpdb->print_error();
 
   $data['friend_coupon'] =  $coupon['coupon_code']; //referer coupon should b    e reverse
-
+  
   print_r($data);
   //echo "REFERID=".$_POST['refer_id'];
   $wpdb->insert($COUPON_REFERAL_TBL,$data);
   $wpdb->print_error();
+
+  /* email coupon code to user */
+
+  //getUserEmail
+  $user = get_userdata($user_id);
+  //$wpdb->get_row("")
+
+  //Render Email Template
+  ob_start();
+  include "FriendEmailTmpl.php";
+  $EMAIL_BODY = ob_get_contents();
+  ob_end_clean();
+  
+  $email_sent = mail($user->user_email,$EMAIL_SUBJECT,$EMAIL_BODY);
+ 
 }
 
 add_action('user_register','get_refer_id');
