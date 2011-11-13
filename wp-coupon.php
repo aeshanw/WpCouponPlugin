@@ -9,9 +9,7 @@ Author URI: http://URI_Of_The_Plugin_Author
 License: none
 */
 
-class CouponReferer{
-
-  function add_query_vars($aVars) {
+function add_query_vars($aVars) {
     $aVars[] = "referid";    // represents the name of the product category as shown in the URL
     return $aVars;
   }
@@ -25,21 +23,57 @@ class CouponReferer{
 add_action('register_form','insert_referid_hidden');
 
 function get_refer_id($user_id){
-  $COUPON_REFERAL_TBL = 'wp_coupon_referals';
+  global $wpdb;
+  $COUPON_REFERAL_TBL = $wpdb->prefix.'coupon_referals';
+  $COUPON_TBL = $wpdb->prefix.'wpsc_coupon_codes';
   $referid = $_POST['refer_id'];
   
   $data = array();
   $data['friend_id'] = $user_id;
   $data['referer_id'] = $referid;
-  $data['friend_coupon'] =  md5($referid.$userid); //referer coupon should be reverse
-  
+ 
+  //create coupon
+  $coupon = create_coupon($user_id,$referid);
+  $wpdb->insert($COUPON_TBL, $coupon);
+
+  $data['friend_coupon'] =  $coupon['coupon_code']; //referer coupon should b    e reverse
+
+  print_r($data);
   //echo "REFERID=".$_POST['refer_id'];
   $wpdb->show_errors();
+  
   $wpdb->insert($COUPON_REFERAL_TBL,$data);
   $wpdb->print_error();
 }
 
 add_action('user_register','get_refer_id');
+
+/*
+ Create couponcode based on bizlogic
+ and coupon obj prior to insert into into DB TBL
+ AND return code
+ @param 
+ @return coupon
+*/
+function create_coupon($userId,$referId){
+  $coupon = array();
+  $coupon['coupon_code'] = md5($userId,$referId);
+  $coupon['value'] = 15.00;// %discount
+  $coupon['is-percentage'] = 1;
+  $coupon['use-once'] = 1;
+  $coupon['is-used'] = 0;
+  $coupon['active'] = 1;
+  $coupon['every_product'] = 1;
+  $coupon['start'] = date();
+  $coupon['expiry'] = date();
+  $coupon['condition'] = "";//special conditions
+  return $coupon;
+}
+
+
+
+
+
 
 
 
