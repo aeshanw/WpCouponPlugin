@@ -27,6 +27,7 @@ add_action('register_form','insert_referid_hidden');
 
 function install_coupon_referal(){
   global $wpdb;
+  global $coupon_referal_db_version;
   $COUPON_REFERAL_TBL = $wpdb->prefix.'coupon_referals';
   $sql = "CREATE TABLE $COUPON_REFERAL_TBL (
     `coupon_referal_id` mediumint(3) NOT NULL AUTO_INCREMENT,
@@ -39,8 +40,10 @@ function install_coupon_referal(){
   require_once(ABSPATH.'wp-admin/includes/upgrade.php');
   dbDelta($sql);
 
-  add_option();
+  add_option('coupon_referal_db_version',$coupon_referal_db_version);
 }
+
+register_activation_hook(__FILE__,'install_coupon_referal');
 
 function get_refer_id($user_id){
   global $wpdb;
