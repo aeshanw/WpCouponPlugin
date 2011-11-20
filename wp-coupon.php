@@ -23,7 +23,7 @@ function add_query_vars($aVars) {
     echo $field;
   }
 
-add_action('register_form','insert_referid_hidden');
+add_action('tml_display_register','insert_referid_hidden');
 
 function install_coupon_referal(){
   global $wpdb;
@@ -91,7 +91,7 @@ function get_refer_id($user_id){
  
 }
 
-add_action('user_register','get_refer_id');
+add_action('tmp_new_user_registered','get_refer_id');
 
 /*
  Create couponcode based on bizlogic
